@@ -42,7 +42,7 @@ class make_q
     void print()
     {
         for(int i=front;i<end;i++)
-            System.out.print((queue_array[i]+1)+" ");
+            System.out.print((queue_array[i])+" ");
         System.out.println("");
     }
 
@@ -117,11 +117,11 @@ class proj1 {
                 for (int i = 0; i < n_process; i++) {
                     if (processes_array[i].arrival_time == time)
                         for (int j = 0; j < n_q; j++) {
-                            int res = queue_array[j].enque(i);
+                            int res = queue_array[j].enque(processes_array[i].process_id);
                             if (res == 1)
                                 break;
                         }
-
+                    
                     if (processes_array[i].burst_time == 0)
                     {
                         queue_array[0].deque();
@@ -129,7 +129,7 @@ class proj1 {
                         flag=1;
                     }
 
-                    if (time > processes_array[i].arrival_time && processes_array[i].burst_time > 0 && queue_array[0].front(i) == 1 && flag==0)
+                    if (time > processes_array[i].arrival_time && processes_array[i].burst_time > 0 && queue_array[0].front(processes_array[i].process_id) == 1 && flag==0)
                         processes_array[i].burst_time--;
 
 
