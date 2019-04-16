@@ -1,146 +1,154 @@
-import java.util.Queue;
+import java.util.*;
+import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Scanner;
+import java.util.Collections;
 
-class process
+class variables
 {
-    public int process_id;
-    public int arrival_time;
-    public int burst_time;
-    Scanner s1 = new Scanner(System.in);
-
-    void put_process()
-    {
-        System.out.println("Process Id : "+process_id+" Arrival Time : "+arrival_time+" Burst Time : "+burst_time);
-    }
+    public static int[] process_id=new int[9];
+   /* public static int[] arrival_time=new int[9];
+    public static int[] burst_time=new int[9];*/
+    public static int[][] data=new int[3][9];
+    //public static int[] priority=new int[];
+    public static LinkedList<Integer> q1 = new LinkedList<Integer>(); //First queue
+    public static LinkedList<Integer> q2 = new LinkedList<Integer>(); //Second queue
+    public static LinkedList<Integer> q3 = new LinkedList<Integer>(); //Third queue
+    public static LinkedList<Integer> readyq = new LinkedList<Integer>(); //Third queue
+    public static int tq1=2;
+    public static int tq2=4;
+    public static int time=0;
 }
 
-class make_q
+class operations extends variables
 {
-    public static final int MAX=4;
-    int front=0,end=0;
-    int queue_array[];
-    make_q()
-    {
-        queue_array=new int[MAX];
-    }
-
-    void deque()
-    {
-        front=(front+1)%MAX;
-    }
-
-    int enque(int i)
-    {
-        if(front==(end+1)%MAX)
-            return 0;
-        queue_array[end]=i;
-        end=(end+1)%MAX;
-        return 1;
-    }
-
-    void print()
-    {
-        for(int i=front;i<end;i++)
-            System.out.print((queue_array[i])+" ");
-        System.out.println("");
-    }
-
-    int front(int i)
-    {
-        if(queue_array[front]==i)
-            return 1;
-        return 0;
-    }
-
-    int isfront(int i)
-    {
-        if(queue_array[front]==i)
-            return 1;
-        return 0;
-    }
-
-
 }
-class proj1 {
-    public static void main(String[] args) {
-        Scanner s1=new Scanner(System.in);
-        System.out.println("Enter the number of queues");
-        int n_q=s1.nextInt();
-        make_q queue_array[]=new make_q[n_q];
 
-        for(int i=0;i<n_q;i++)
+class proj1
+{
+public static void main(String[] args)
+{
+    Scanner s1=new Scanner(System.in);
+    System.out.println("Enter the number of processes");
+    int n=s1.nextInt();
+    int temp[]=new int[n];
+    int max_bt=0;
+
+    for(int i=0;i<n;i++)
+    {
+        System.out.println("Enter PID,AT,BT");
+        variables.process_id[i]=s1.nextInt();
+        variables.data[0][i]=variables.process_id[i];
+        variables.data[1][i]=s1.nextInt();
+        variables.data[2][i]=s1.nextInt();
+        /*variables.arrival_time[i]=s1.nextInt();
+        variables.burst_time[i]=s1.nextInt();
+        //variables.priority[i]=s1.nextInt();*/
+        temp[i]=variables.data[1][i];
+        if(variables.data[2][i]>max_bt)
+            max_bt=variables.data[2][i];
+    }
+    Arrays.sort(temp);
+    int max_time=temp[n-1]+max_bt;
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+            if(temp[i]==variables.data[1][j])
+                variables.readyq.add(variables.process_id[j]);
+
+    for (int i=0;i<n;i++)
+        System.out.println(variables.data[0][i]);
+
+    int count=0,ttq1=0,flag1=0,ttq2=0,flag2=0;
+    while (variables.time<=12)
+    {
+
+        if(!variables.q1.isEmpty())
         {
-            queue_array[i]=new make_q();
-        }
 
-        System.out.println("Enter the no of process");
-        int n_process=s1.nextInt();
-
-        int process_id_array[]=new int[n_process];
-        int arrival_time_array[]=new int[n_process];
-        int burst_time_array[]=new int[n_process];
-
-        process processes_array[]=new process[n_process];
-
-        for(int i=0;i<n_process;i++)
-        {
-            System.out.println("Enter value of process_id,arrival_time,burst_time");
-            process_id_array[i]=s1.nextInt();
-            arrival_time_array[i]=s1.nextInt();
-            burst_time_array[i]=s1.nextInt();
-        }
-
-        for(int i=0;i<n_process;i++)
-        {
-            processes_array[i]=new process();
-            int loc=0,min=100000;
-            for(int j=0;j<n_process;j++)
-                if(arrival_time_array[j]<min)
+            if(ttq1==0 || flag1==1)
+                ttq1=variables.tq1;
+            flag1=0;
+            for(count=0;count<n;count++)
+                if(variables.q1.peek()==variables.data[0][count])
                 {
-                    min=arrival_time_array[j];
-                    loc=j;
+                    variables.data[2][count]--;
+                    System.out.println(variables.data[2][count]);
+                    if(variables.data[2][count]==0)
+                    {
+                        variables.q1.remove();//deque q1;
+                        flag1=1;
+                        break;
+                    }
                 }
-                processes_array[i].arrival_time=arrival_time_array[loc];
-                processes_array[i].burst_time=burst_time_array[loc];
-                processes_array[i].process_id=process_id_array[loc];
-                arrival_time_array[loc]=999999;
+            ttq1--;
+            if(ttq1==0 && flag1!=1)
+                variables.q2.add(variables.q1.poll());                    //Demote q1.peek();
+
         }
 
-        for (int i=0;i<n_process;i++)
-            processes_array[i].put_process();
-
-        int time=0;
-        while (time!=10)
+        if(variables.q1.isEmpty() && !variables.q2.isEmpty())
         {
-                int flag=0;
-                for (int i = 0; i < n_process; i++) {
-                    if (processes_array[i].arrival_time == time)
-                        for (int j = 0; j < n_q; j++) {
-                            int res = queue_array[j].enque(processes_array[i].process_id);
-                            if (res == 1)
-                                break;
-                        }
-                    
-                    if (processes_array[i].burst_time == 0)
+
+            if(ttq2==0 || flag2==1)
+                ttq2=variables.tq2;
+            flag2=0;
+            for(count=0;count<n;count++)
+                if(variables.q2.peek()==variables.data[0][count])
+                {
+                    variables.data[2][count]--;
+                    System.out.println(variables.data[2][count]);
+                    if(variables.data[2][count]==0)
                     {
-                        queue_array[0].deque();
-                        processes_array[i].burst_time--;
-                        flag=1;
+                        variables.q2.remove();//deque q1;
+                        flag2=1;
+                        break;
+                    }
+                }
+            ttq2--;
+            if(ttq2==0 && flag2!=1)
+                variables.q3.add(variables.q2.poll());                    //Demote q1.peek();
+
+        }
+        //System.out.println(variables.readyq.peek());
+        for(count=0;count<n;count++)
+            if(!variables.readyq.isEmpty())
+            if(variables.readyq.peek()==variables.data[0][count])
+                    if(variables.time==variables.data[1][count])
+                    {
+                        int d=variables.readyq.poll();
+                        System.out.println(d);
+                        if(variables.q1.size()<3)
+                            variables.q1.add(d);
+                        else if(variables.q2.size()<3)
+                            variables.q2.add(d);
+                        else if(variables.q3.size()<3)
+                            variables.q3.add(d);
+
+         //   System.out.println(variables.readyq.peek());
                     }
 
-                    if (time > processes_array[i].arrival_time && processes_array[i].burst_time > 0 && queue_array[0].front(processes_array[i].process_id) == 1 && flag==0)
-                        processes_array[i].burst_time--;
 
 
-                }
-                System.out.print("Time : " + time);
-                for (int i = 0; i < n_q; i++) {
-                    System.out.print(" Queue " + (i + 1) + " : ");
-                    queue_array[i].print();
-                }
-                time++;
-            }
-
+        variables.time++;
+        System.out.println("Ready Q : "+variables.readyq);
+        System.out.println("Queue 1 : "+variables.q1);
+        System.out.println("Queue 2 : "+variables.q2);
+        System.out.println("Queue 3 : "+variables.q3);
     }
+    System.out.println("Ready Q : "+variables.readyq);
+    System.out.println("Queue 1 : "+variables.q1);
+    System.out.println("Queue 2 : "+variables.q2);
+    System.out.println("Queue 3 : "+variables.q3);
+
+    /*int count=0,time=0;
+    while (time<=max_time)
+    {
+
+
+            time++;
+    }
+
+    System.out.println("Queue 1 : "+variables.q1);
+    System.out.println("Queue 2 : "+variables.q2);
+    System.out.println("Queue 3 : "+variables.q3);*/
+}
 }
