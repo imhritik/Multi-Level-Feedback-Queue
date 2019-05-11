@@ -2,7 +2,7 @@ import java.util.*;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Collections;
-
+//This code has the algorithm needed for MLFQ.
 class variables
 {
     public static int[] process_id=new int[9];
